@@ -7,6 +7,36 @@ output:
     css: style.css
 ---
 
+## Spiritual Thought
+
+"If you do feel filled with [Christ's] love in this season of your life, please try and hold on to it as effectively as a sieve holds water..."
+
+[Have you ever tried to carry water in a sieve?](https://www.youtube.com/watch?v=CBbhbuPb6ZA)
+
+"Let's look for and treasure experiences of feeling His love and power in our lives. The joy of the gospel is available to all: not just the happy, not just the downcast. Joy is our purpose, not the gift of our circumstances."
+
+Karl D. Hirst: "God's Favourite", October 2024 General Conference
+
+## Motivation
+
+* Imagine you work for a mid-sized hotel chain.
+* Your supervisor says they want a report on what customers like/dislike about staying at your hotels.
+* How would you create this report?
+
+## Motivation
+
+* Imagine you work for a mid-sized hotel chain.
+* Your supervisor says they want a report on what customers like/dislike about staying at your hotels.
+* How would you create this report?
+* As a Marketer, what do we ACTUALLY want to be able to do with this information?
+
+## Translation:
+
+Provide your supervisor with some *actionable* recommendations based on customer sentiment themes.
+
+* **Highlight what is working**: if we find that *staff friendliness* and *location* are viewed positively, these can be featured in our ads.
+* **Fix what is broken**: if *noise levels* and *cleanliness* are associated with negative sentiment, these may be areas for operational improvement.
+
 ## Marketing Analytics Process
 
 <center>
