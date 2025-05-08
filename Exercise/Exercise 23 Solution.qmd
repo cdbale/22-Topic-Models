@@ -1,0 +1,59 @@
+---
+title: "Exercise 23"
+author: "Marc Dotson"
+format: docx
+---
+
+1. Run a topic model with three topics in `roomba_reviews`.
+2. Visualize the topics and name them. Justify your names.
+3. Render the Quarto document into Word and upload to Canvas.
+
+**Five points total, one point each for:**
+
+- **Tokenizing Review into words.**
+- **Using cast_dtm() to create a DTM.**
+- **Running LDA with k = 3.**
+- **Visualizing and naming the topics, with justification for each name.**
+- **Submitting a rendered Word document.**
+
+## Run a Topic Model
+
+```{r}
+# Load packages.
+library(tidyverse)
+library(tidytext)
+library(topicmodels)
+
+# Import data, tokenize, remove stop words, cast a DTM, run a topic model.
+set.seed(42)
+fit_lda3 <- read_csv(here::here("Data", "roomba_reviews.csv")) |>
+  mutate(review_id = row_number()) |> 
+  unnest_tokens(word, Review) |> 
+  anti_join(stop_words, join_by(word)) |> 
+  count(word, review_id) |>
+  cast_dtm(review_id, word, n) |> 
+  LDA(k = 3, method = "Gibbs")
+```
+
+## Name the Topics
+
+```{r}
+# Visualize the topics.
+fit_lda3 |> 
+  tidy(matrix = "beta") |> 
+  group_by(topic) |> 
+  top_n(10, beta) |>
+  ungroup() |>
+  mutate(term = reorder_within(term, beta, topic)) |>
+  ggplot(aes(x = beta, y = term, fill = as.factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  scale_y_reordered()
+```
+
+Let's name the topics.
+
+- **Features**: This topic is highest on `roomba` and `880` and the features associated with the features of a robotic vacuum: `cleaning`, `clean`, `vacuum`, `battery`. This seems positive overall.
+- **Flaws**: This topic is highest overall on the `time`, `floor`, `house`, `clean`, and `stuck` -- all possible flaws or pain points with robotic vacuums.
+- **Functions**: This topic is highest overall on `hair`, `floors`, `love`, `dog`, and `dirt` all part of the function of robotic vacuums and likely positive overall.
+
