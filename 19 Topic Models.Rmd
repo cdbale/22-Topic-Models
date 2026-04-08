@@ -1,38 +1,34 @@
 ---
 title: "Topic Models"
-subtitle: "MKTG 411 Marketing Analytics"
+subtitle: "MCB Consulting Group (MKTG 411)"
 output: 
   ioslides_presentation:
     widescreen: true
     css: style.css
 ---
 
-## Spiritual Thought
+## Student Ratings
 
-"If you do feel filled with [Christ's] love in this season of your life, please try and hold on to it as effectively as a sieve holds water..."
+It's that time again: [studentratings.byu.edu](https://studentratings.byu.edu).
 
-[Have you ever tried to carry water in a sieve?](https://www.youtube.com/watch?v=CBbhbuPb6ZA)
+## Example
 
-"Let's look for and treasure experiences of feeling His love and power in our lives. The joy of the gospel is available to all: not just the happy, not just the downcast. Joy is our purpose, not the gift of our circumstances."
-
-Karl D. Hirst: "God's Favourite", October 2024 General Conference
-
-## Motivation
-
-* Imagine you work for a mid-sized hotel chain.
-* Your supervisor says they want a report on what customers like/dislike about staying at your hotels.
+* One of our new clients, a mid-sized hotel chain, has requested a report on what customers like/dislike about staying at their hotels.
 * How would you create this report?
+  - Data sources?
+  - Methods of analyzing that data?
 
-## Motivation
+## Example
 
-* Imagine you work for a mid-sized hotel chain.
-* Your supervisor says they want a report on what customers like/dislike about staying at your hotels.
+* One of our new clients, a mid-sized hotel chain, has requested a report on what customers like/dislike about staying at their hotels.
 * How would you create this report?
-* As a Marketer, what do we ACTUALLY want to be able to do with this information?
+  - Data sources?
+  - Methods of analyzing that data?
+* What do we ACTUALLY want to be able to do with this information?
 
 ## Translation:
 
-Provide your supervisor with some *actionable* recommendations based on customer sentiment themes.
+Provide the client with some *actionable* recommendations based on customer sentiment themes.
 
 * **Highlight what is working**: if we find that *staff friendliness* and *location* are viewed positively, these can be featured in our ads.
 * **Fix what is broken**: if *noise levels* and *cleanliness* are associated with negative sentiment, these may be areas for operational improvement.
@@ -79,7 +75,7 @@ seed_num <- 42
 ## Import Data
 
 ```{r}
-roomba_reviews <- read_csv(here::here("Data", "roomba_reviews.csv"))
+roomba_reviews <- read_csv("roomba_reviews.csv")
 ```
 
 ## Tokenize, Remove Stop Words, and Visualize
@@ -137,9 +133,9 @@ tidy_reviews |>
 Word frequencies *suggest* overall meaning, but we would like to uncover the different **topics** being written about. This is especially true as the size of a corpus increases.
 
 - Topic models uncover groups of words (i.e., topics) via *unsupervised learning*.
+- The goal is to find *topics* that occur frequently across documents.
+- Documents are treated as *mixtures of topics*.
 - The most common topic model is called **latent Dirichlet allocation** or LDA.
-
-Where cluster analysis is based on distance between observations, topic modeling is based on word counts. While clustering assigns each observation to a cluster, topic modeling identifies every document as a mixture of topics.
 
 ## Fit LDA
 
@@ -169,7 +165,7 @@ fit_lda2
 
 ## Hyperparameter Tuning
 
-We'd like to tune `k` similar to what we did with clustering.
+We can select a value of `k` by computing the log-likelihood of the data, given the value of `k`. This number represents how likely we would be to observe the documents in our data if the number of topics was truly equal to `k` (the larger the log-likelihood value, the better).
 
 ```{r}
 # Tune k.
@@ -196,16 +192,14 @@ ggplot(fit_tune, aes(x = num_topics, y = model_fit)) +
 
 ## Evaluate Topics
 
-The most important output from a topic model are the topics themselves: the dictionary of words, sorted according to the **probability** the word is part of that topic.
-
-Let's tidy these probabilities (i.e., betas).
+We will examine the coefficients (betas) from the topic model, which represent the probability that a given word is part of a given topic.
 
 ```{r eval=FALSE}
 # Fit a final topic model.
 fit_lda6 <- dtm_reviews |> 
   LDA(k = 6, method = "Gibbs")
 
-# Produce probabilities.
+# view probabilities.
 tidy(fit_lda6, matrix = "beta") |> 
   arrange(desc(beta))
 ```
@@ -224,7 +218,7 @@ tidy(fit_lda6, matrix = "beta") |>
 
 ---
 
-Now we can visualize our topics.
+Visualize our topics.
 
 ```{r eval=FALSE}
 fit_lda6 |> 
@@ -300,32 +294,11 @@ roomba_reviews |>
 
 Topic models are great - but do we have another tool that is adept at analyzing large amounts of text?
 
-## CV/Resume
-
-- Statistical programming in R.
-- Wrangle and visualize data.
-- Query databases.
-- Build dashboards.
-- Use regression models for inference.
-- Use machine learning models for prediction.
-- Employ clustering to segment consumers.
-- Run topic modeling.
-- Produce and communicate results in terms of business insights.
-
-## What Next?
-
-- Read supplementary texts.
-- Whenever you use Excel, use R instead (or as well).
-- Consider taking MKTG 585R and stats classes.
-- Sign up for on-campus internships.
-- Learn additional (programming) languages.
-
 ## Wrapping Up
 
 *Summary*
 
 - Used NLP, including reviewing tokenizing and removing stop words, sentiment analysis, and topic modeling.
-- Discussed what to add to your CV and recommendations for next steps.
 
 *Next Time*
 
@@ -335,7 +308,7 @@ Topic models are great - but do we have another tool that is adept at analyzing 
 
 - *Text Mining with R*
 
-## Exercise 22
+## Exercise 18
 
 1. Run a topic model with three topics in `roomba_reviews`.
 2. Visualize the topics and name them. Justify your names.

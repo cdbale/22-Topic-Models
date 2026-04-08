@@ -1,6 +1,6 @@
 ---
-title: "Exercise 23"
-author: "Marc Dotson"
+title: "Exercise 18"
+author: "Cameron Bale"
 format: docx
 ---
 
@@ -26,7 +26,7 @@ library(topicmodels)
 
 # Import data, tokenize, remove stop words, cast a DTM, run a topic model.
 set.seed(42)
-fit_lda3 <- read_csv(here::here("Data", "roomba_reviews.csv")) |>
+fit_lda3 <- read_csv("roomba_reviews.csv") |>
   mutate(review_id = row_number()) |> 
   unnest_tokens(word, Review) |> 
   anti_join(stop_words, join_by(word)) |> 

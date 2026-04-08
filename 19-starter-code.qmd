@@ -1,0 +1,191 @@
+---
+title: "Topic Models"
+format: docx
+editor: visual
+---
+
+## Student Ratings
+
+It's that time again: [studentratings.byu.edu](https://studentratings.byu.edu).
+
+## Install packages!
+
+* `topicmodels`
+* `wordcloud`
+
+```{r}
+
+```
+
+## Load Packages
+
+```{r}
+# Load packages.
+library(tidyverse)
+library(tidytext)
+library(topicmodels)
+library(dbplyr)
+library(DBI)
+
+seed_num <- 42
+```
+
+## Import Data
+
+```{r}
+roomba_reviews <- read_csv("roomba_reviews.csv")
+```
+
+## Tokenize, Remove Stop Words, and Visualize
+
+Like we did previously, let's tokenize, remove stop words, and visualize word counts.
+
+```{r}
+# Tokenize and remove stop words.
+tidy_reviews <- roomba_reviews |>
+  mutate(review_id = row_number()) |> 
+  unnest_tokens(word, Review) |> 
+  anti_join(stop_words, join_by(word))
+
+# Visualize word counts.
+tidy_reviews |> 
+  count(word) |> 
+  arrange(desc(n)) |> 
+  slice(1:10) |> 
+  mutate(word = fct_reorder(word, n)) |>
+  ggplot(aes(x = n, y = word)) +
+  geom_col()
+```
+
+## Word Clouds
+
+Word clouds are just word counts.
+
+```{r}
+tidy_reviews |> 
+  count(word) |> 
+  with(wordcloud::wordcloud(words = word, freq = n, max.words = 30))
+```
+
+## Topic Modeling
+
+Word frequencies *suggest* overall meaning, but we would like to uncover the different **topics** being written about. This is especially true as the size of a corpus increases.
+
+- Topic models uncover groups of words (i.e., topics) via *unsupervised learning*.
+- The goal is to find *topics* that occur frequently across documents.
+- Documents are treated as *mixtures of topics*.
+- The most common topic model is called **latent Dirichlet allocation** or LDA.
+
+## Fit LDA
+
+The input for a topic model is a **document term matrix** (DTM). Let’s "cast" our tidy data into a DTM.
+
+```{r}
+# Create a DTM.
+dtm_reviews <- tidy_reviews |>
+  count(word, review_id) |>
+  cast_dtm(review_id, word, n)
+
+dtm_reviews
+```
+
+Fitting a topic model is straightforward with a DTM.
+
+```{r}
+# Fit a topic model.
+set.seed(seed_num)
+fit_lda2 <- dtm_reviews |> 
+  LDA(k = 2, method = "Gibbs")
+
+fit_lda2
+```
+
+## Hyperparameter Tuning
+
+We can select a value of `k` by computing the log-likelihood of the data, given the value of `k`. This number represents how likely we would be to observe the documents in our data if the number of topics was truly equal to `k` (the larger the log-likelihood value, the better).
+
+```{r}
+# Tune k.
+fit_tune <- tibble(num_topics = 2:10) |>
+  mutate(
+    fit_lda = pmap(
+      list(k = num_topics), 
+      LDA, 
+      x = dtm_reviews, method = "Gibbs"
+    ),
+    model_fit = map(fit_lda, logLik) |> as.numeric()
+  )
+```
+
+Now we can plot the model fit statistics to determine what `k` might be set to, though it still requires a subjective evaluation of a range of possible models.
+
+```{r fig.width=6, fig.height=4}
+ggplot(fit_tune, aes(x = num_topics, y = model_fit)) +
+  geom_point() + 
+  geom_line()
+```
+
+## Evaluate Topics
+
+We will examine the coefficients (betas) from the topic model, which represent the probability that a given word is part of a given topic.
+
+```{r}
+# Fit a final topic model.
+fit_lda6 <- dtm_reviews |> 
+  LDA(k = 6, method = "Gibbs")
+
+# view probabilities.
+tidy(fit_lda6, matrix = "beta") |> 
+  arrange(desc(beta))
+```
+
+Visualize our topics. How would you name/interpret these topics?
+
+```{r}
+fit_lda6 |> 
+  tidy(matrix = "beta") |>
+  group_by(topic) |> 
+  top_n(8, beta) |>
+  ungroup() |>
+  mutate(term = reorder_within(term, beta, topic)) |>
+  ggplot(aes(x = beta, y = term, fill = as.factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  scale_y_reordered()
+```
+
+## Map Documents to Topics
+
+You can examine the reviews assigned to each topic for additional context.
+
+```{r}
+# extract topic classification for each document from the model
+# note that documents can contain multiple topics - here we only
+# see the most likely
+topic_classifications <- tibble(
+  doc_number = as.numeric(names(topics(fit_lda6))),
+  topic_number = topics(fit_lda6)
+)
+
+# join the topic classifications to the original review data
+roomba_reviews <- roomba_reviews |>
+  mutate(doc_number = 1:n()) |>
+  left_join(topic_classifications, join_by(doc_number)) |>
+  drop_na(topic_number)
+```
+
+Look for documents classified to Topic 6.
+
+```{r}
+roomba_reviews |>
+  filter(topic_number == 6) |>
+  select(Review)
+```
+
+Look for documents classified to Topic 2.
+
+```{r}
+roomba_reviews |>
+  filter(topic_number == 2) |>
+  select(Review)
+```
