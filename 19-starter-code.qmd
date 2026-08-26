@@ -10,11 +10,13 @@ It's that time again: [studentratings.byu.edu](https://studentratings.byu.edu).
 
 ## Install packages!
 
-* `topicmodels`
-* `wordcloud`
+-   `topicmodels`
+-   `wordcloud`
 
 ```{r}
-
+install.packages('topicmodels')
+install.packages('wordcloud')
+install.packages('reshape2')
 ```
 
 ## Load Packages
@@ -71,10 +73,10 @@ tidy_reviews |>
 
 Word frequencies *suggest* overall meaning, but we would like to uncover the different **topics** being written about. This is especially true as the size of a corpus increases.
 
-- Topic models uncover groups of words (i.e., topics) via *unsupervised learning*.
-- The goal is to find *topics* that occur frequently across documents.
-- Documents are treated as *mixtures of topics*.
-- The most common topic model is called **latent Dirichlet allocation** or LDA.
+-   Topic models uncover groups of words (i.e., topics) via *unsupervised learning*.
+-   The goal is to find *topics* that occur frequently across documents.
+-   Documents are treated as *mixtures of topics*.
+-   The most common topic model is called **latent Dirichlet allocation** or LDA.
 
 ## Fit LDA
 
@@ -177,9 +179,13 @@ roomba_reviews <- roomba_reviews |>
 Look for documents classified to Topic 6.
 
 ```{r}
-roomba_reviews |>
+topic_6_reviews <- roomba_reviews |>
   filter(topic_number == 6) |>
   select(Review)
+
+topic_6_reviews |>
+  slice(2) |>
+  pull(Review)
 ```
 
 Look for documents classified to Topic 2.
@@ -188,4 +194,10 @@ Look for documents classified to Topic 2.
 roomba_reviews |>
   filter(topic_number == 2) |>
   select(Review)
+```
+
+```{r}
+temp |>
+  slice(1:10) |>
+  pull(Review)
 ```
